@@ -1,6 +1,7 @@
 from typing import Any
 import httpx
 import logging
+import random
 
 from mcp.server.fastmcp import FastMCP
 
@@ -55,6 +56,16 @@ async def get_alerts(state: str) -> str:
 
     alerts = [format_alert(feature) for feature in data["features"]]
     return "\n---\n".join(alerts)
+
+
+@mcp.tool()
+def roll_dice(n_dice: int) -> list[int]:
+    """Roll `n_dice` 6-sided dice and return the results.
+    
+    Args:
+        n_dice: Number of dice to roll
+    """
+    return [random.randint(1, 6) for _ in range(n_dice)]
 
 @mcp.tool()
 async def get_forecast(latitude: float, longitude: float) -> str:
