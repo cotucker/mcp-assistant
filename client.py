@@ -170,37 +170,11 @@ class MCPClient:
                 import traceback
                 error_info = traceback.format_exc()
                 print(f"\nError (Client): {str(e)}")
-                print(f"\nПодробности ошибки:\n{error_info}")
+                print(f"\nError Details:\n{error_info}")
     
     async def cleanup(self):
         """Clean up resources"""
         await self.exit_stack.aclose()
-
-
-
-
-def to_dict(obj: Any) -> Any:
-    """
-    Рекурсивно конвертирует объект (включая объекты Protobuf и Enum) 
-    в словарь, который можно сериализовать в JSON.
-    """
-    if isinstance(obj, Message):
-        # Если это Protobuf-совместимый объект (как большинство в ответе Gemini)
-        result = {}
-        for field, value in obj._pb.ListFields():
-            result[field.name] = to_dict(value)
-        return result
-    
-    if isinstance(obj, enum.Enum):
-        # Конвертируем Enum в его строковое имя
-        return obj.name
-        
-    if isinstance(obj, list):
-        # Рекурсивно обрабатываем каждый элемент списка
-        return [to_dict(item) for item in obj]
-
-    # Если это уже базовый тип, возвращаем как есть
-    return obj
 
 async def main():
     if len(sys.argv) < 2:
