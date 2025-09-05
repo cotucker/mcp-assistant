@@ -147,7 +147,7 @@ class MCPClient:
         #         result = await self.session.call_tool(tool_name, tool_args)
         #         final_text.append(f"[Calling tool {tool_name} with args {tool_args}]")
 
-        return "\n".join(result)
+        return str(result)
         
 
 
@@ -167,7 +167,10 @@ class MCPClient:
                 print("\n" + response)
                     
             except Exception as e:
-                print(f"\nError: {str(e)}")
+                import traceback
+                error_info = traceback.format_exc()
+                print(f"\nError (Client): {str(e)}")
+                print(f"\nПодробности ошибки:\n{error_info}")
     
     async def cleanup(self):
         """Clean up resources"""
