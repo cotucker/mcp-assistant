@@ -77,7 +77,7 @@ async def get_weather(location: str) -> str:
     location_from_response = str(data['location']['name']) + ', ' + str(data['location']['country'])
     current = data['current']
     weather = f"""
- Current Weather for {location_from_response}:
+Current Weather for {location_from_response}:
 Temperature: {current['temp_c']}°C
 Feels like: {current['feelslike_c']}°C
 Wind: {current['wind_kph']} kph {current['wind_dir']}

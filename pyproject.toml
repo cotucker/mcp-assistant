@@ -11,4 +11,5 @@ dependencies = [
     "mcp[cli]>=1.13.1",
     "protobuf>=6.32.0",
     "python-dotenv>=1.1.1",
+    "spotipy>=2.25.1",
 ]
