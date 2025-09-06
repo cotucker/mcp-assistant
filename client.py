@@ -17,11 +17,10 @@ from dotenv import load_dotenv
 from pydantic import BaseModel, config
 import os, logging, json
 
-load_dotenv()  # load environment variables from .env
+load_dotenv()
 
 class MCPClient:
     def __init__(self):
-        # Initialize session and client objects
         self.session: Optional[ClientSession] = None
         self.exit_stack = AsyncExitStack()
         self.gemini = genai.Client(api_key=os.getenv('GEMINI_API_KEY'))
@@ -58,17 +57,8 @@ class MCPClient:
 
     async def process_query(self, query: str) -> str:
         """Process a query using Claude and available tools"""
-        messages = [
-            {
-                "role": "user",
-                "content": query
-            }
-        ]
 
         response = await self.session.list_tools()
-
-        # tools = types.Tool(function_declarations=gemini_tools)
-
 
         tools = [
             types.Tool(
@@ -87,12 +77,11 @@ class MCPClient:
             for tool in response.tools
         ]
 
-
         contents = [
             types.Content(
                 role="user",
                 parts=[types.Part(text=query)]
-            )
+            ),
         ]
 
         config = types.GenerateContentConfig(tools = tools)
@@ -103,9 +92,9 @@ class MCPClient:
         )
 
         response = response.candidates[0]
+        print(response)
 
-        # print(response_json)
-        final_text = []
+        final_text = ''
 
         content = response.content
         for part in content.parts:
@@ -113,43 +102,19 @@ class MCPClient:
                 function_call_object = part.function_call
                 tool_name = function_call_object.name
                 tool_args = function_call_object.args
-                print(f"Имя функции: {tool_name}")
-                print(f"Аргументы: {tool_args}")
                 if not isinstance(tool_args, dict):
                     tool_args = dict(tool_args)
                 result = await self.session.call_tool(
                     name=tool_name,
-                    arguments=tool_args
+                    arguments=tool_args,
                 )
-                print(f"Результаты броска: {result}")
-                # result = await self.session.call_tool(tool_name, arguments=dict(tool_args))
-                # final_text.append(f"[Calling tool {tool_name} with args {tool_args}]")                
+                print(result)
+                final_text += f"[Calling tool {tool_name} with args {tool_args}]\n{result.structuredContent['result']}\n"
 
+            elif part.text:
+                final_text += part.text
 
-
-
-
-
-        # assistant_message_content = []
-
-        # for content in response.content:
-        #     for part in content.parts:
-        #         # if content.type == 'text':
-        #         #     final_text.append(content.text)
-        #         #     assistant_message_content.append(content)
-        #         # elif content.type == 'tool_use':
-        #         #     tool_name = content.name
-        #         #     tool_args = content.input
-        #         tool_name = part.function_call.name
-        #         tool_args = part.function_call.args
-        #         final_text.append(f"[Trying to call a tool {tool_name} with args {tool_args}]")
-        #             # Execute tool call
-        #         result = await self.session.call_tool(tool_name, tool_args)
-        #         final_text.append(f"[Calling tool {tool_name} with args {tool_args}]")
-
-        return str(result)
-        
-
+        return final_text
 
     async def chat_loop(self):
         """Run an interactive chat loop"""

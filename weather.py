@@ -2,14 +2,20 @@ from typing import Any
 import httpx
 import logging
 import random
+import requests
+import os
 
+from dotenv import load_dotenv
 from mcp.server.fastmcp import FastMCP
 
 # Initialize FastMCP server
 mcp = FastMCP("weather")
 
+load_dotenv()
+
 # Constants
 NWS_API_BASE = "https://api.weather.gov"
+WEATHER_API_KEY = os.getenv('WEATHER_API_KEY')
 USER_AGENT = "weather-app/1.0"
 
 
@@ -31,12 +37,12 @@ def format_alert(feature: dict) -> str:
     """Format an alert feature into a readable string."""
     props = feature["properties"]
     return f"""
-Event: {props.get('event', 'Unknown')}
-Area: {props.get('areaDesc', 'Unknown')}
-Severity: {props.get('severity', 'Unknown')}
-Description: {props.get('description', 'No description available')}
-Instructions: {props.get('instruction', 'No specific instructions provided')}
-"""
+    Event: {props.get('event', 'Unknown')}
+    Area: {props.get('areaDesc', 'Unknown')}
+    Severity: {props.get('severity', 'Unknown')}
+    Description: {props.get('description', 'No description available')}
+    Instructions: {props.get('instruction', 'No specific instructions provided')}
+    """
 
 @mcp.tool()
 async def get_alerts(state: str) -> str:
@@ -57,15 +63,42 @@ async def get_alerts(state: str) -> str:
     alerts = [format_alert(feature) for feature in data["features"]]
     return "\n---\n".join(alerts)
 
+@mcp.tool()
+async def get_weather(location: str) -> str:
+    """Get current weather for a location.
+
+    Args:
+        location: Location to get weather for
+    """
+    print('Location: .f,gmlkfdsgkldsfjglksdg')
+    response = requests.get(f'http://api.weatherapi.com/v1/current.json?key={WEATHER_API_KEY}&q={location}&aqi=no')
+    data = response.json()
+    location_from_response = str(data['location']['name']) + ', ' + str(data['location']['country'])
+    current = data['current']
+    weather = f"""
+    Current Weather for {location_from_response}:
+    Temperature: {current['temp_c']}°C
+    Feels like: {current['feelslike_c']}°C
+    Wind: {current['wind_kph']} kph {current['wind_dir']}
+    Humidity: {current['humidity']}%
+    Condition: {current['condition']['text']}
+    Pressure: {current['pressure_mb']} mb
+    """
+    return weather
+
+
 
 @mcp.tool()
-def roll_dice(n_dice: int) -> list[int]:
+def roll_dice(n_dice: int) -> str:
     """Roll `n_dice` 6-sided dice and return the results.
     
     Args:
         n_dice: Number of dice to roll
     """
-    return [random.randint(1, 6) for _ in range(n_dice)]
+    result = 'Result 🎲: '
+    for _ in range(n_dice):
+        result += str(random.randint(1, 6)) + ' '
+    return result
 
 @mcp.tool()
 async def get_forecast(latitude: float, longitude: float) -> str:
@@ -94,11 +127,11 @@ async def get_forecast(latitude: float, longitude: float) -> str:
     forecasts = []
     for period in periods[:5]:  # Only show next 5 periods
         forecast = f"""
-{period['name']}:
-Temperature: {period['temperature']}°{period['temperatureUnit']}
-Wind: {period['windSpeed']} {period['windDirection']}
-Forecast: {period['detailedForecast']}
-"""
+        {period['name']}:
+        Temperature: {period['temperature']}°{period['temperatureUnit']}
+        Wind: {period['windSpeed']} {period['windDirection']}
+        Forecast: {period['detailedForecast']}
+        """
         forecasts.append(forecast)
 
     return "\n---\n".join(forecasts)
