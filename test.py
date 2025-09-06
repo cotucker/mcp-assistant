@@ -18,14 +18,14 @@ def get_weather(location: str) -> str:
     location_from_response = str(data['location']['name']) + ', ' + str(data['location']['country'])
     current = data['current']
     weather = f"""
-    Current Weather for {location_from_response}:
-    Temperature: {current['temp_c']}°C
-    Feels like: {current['feelslike_c']}°C
-    Wind: {current['wind_kph']} kph {current['wind_dir']}
-    Humidity: {current['humidity']}%
-    Condition: {current['condition']['text']}
-    Pressure: {current['pressure_mb']} mb
-    """
+Current Weather for {location_from_response}:
+Temperature: {current['temp_c']}°C
+Feels like: {current['feelslike_c']}°C
+Wind: {current['wind_kph']} kph {current['wind_dir']}
+Humidity: {current['humidity']}%
+Condition: {current['condition']['text']}
+Pressure: {current['pressure_mb']} mb
+"""
     return weather
 
 if __name__ == '__main__':

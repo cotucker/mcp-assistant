@@ -92,7 +92,6 @@ class MCPClient:
         )
 
         response = response.candidates[0]
-        print(response)
 
         final_text = ''
 
@@ -108,7 +107,6 @@ class MCPClient:
                     name=tool_name,
                     arguments=tool_args,
                 )
-                print(result)
                 final_text += f"[Calling tool {tool_name} with args {tool_args}]\n{result.structuredContent['result']}\n"
 
             elif part.text:
