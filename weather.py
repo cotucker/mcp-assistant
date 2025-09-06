@@ -11,6 +11,8 @@ from mcp.server.fastmcp import FastMCP
 # Initialize FastMCP server
 mcp = FastMCP("weather")
 
+
+
 load_dotenv()
 
 # Constants
@@ -41,8 +43,7 @@ Event: {props.get('event', 'Unknown')}
 Area: {props.get('areaDesc', 'Unknown')}
 Severity: {props.get('severity', 'Unknown')}
 Description: {props.get('description', 'No description available')}
-Instructions: {props.get('instruction', 'No specific instructions provided')}
-"""
+Instructions: {props.get('instruction', 'No specific instructions provided')}"""
 
 @mcp.tool()
 async def get_alerts(state: str) -> str:
@@ -76,14 +77,13 @@ async def get_weather(location: str) -> str:
     location_from_response = str(data['location']['name']) + ', ' + str(data['location']['country'])
     current = data['current']
     weather = f"""
-Current Weather for {location_from_response}:
+ Current Weather for {location_from_response}:
 Temperature: {current['temp_c']}°C
 Feels like: {current['feelslike_c']}°C
 Wind: {current['wind_kph']} kph {current['wind_dir']}
 Humidity: {current['humidity']}%
 Condition: {current['condition']['text']}
-Pressure: {current['pressure_mb']} mb
-"""
+Pressure: {current['pressure_mb']} mb"""
     return weather
 
 
