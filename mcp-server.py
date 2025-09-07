@@ -10,7 +10,7 @@ from dotenv import load_dotenv
 from google import genai
 from google.genai import types
 from mcp.server.fastmcp import FastMCP
-from urllib3 import response
+# from urllib3 import response
 
 # Initialize FastMCP server
 mcp = FastMCP("weather")
@@ -114,24 +114,22 @@ async def get_forecast(latitude: float, longitude: float) -> str:
         latitude: Latitude of the location
         longitude: Longitude of the location
     """
-    # First get the forecast grid endpoint
+
     points_url = f"{NWS_API_BASE}/points/{latitude},{longitude}"
     points_data = await make_nws_request(points_url)
 
     if not points_data:
         return "Unable to fetch forecast data for this location."
 
-    # Get the forecast URL from the points response
     forecast_url = points_data["properties"]["forecast"]
     forecast_data = await make_nws_request(forecast_url)
 
     if not forecast_data:
         return "Unable to fetch detailed forecast."
 
-    # Format the periods into a readable forecast
     periods = forecast_data["properties"]["periods"]
     forecasts = []
-    for period in periods[:5]:  # Only show next 5 periods
+    for period in periods[:5]:
         forecast = f"""
         {period['name']}:
         Temperature: {period['temperature']}°{period['temperatureUnit']}
@@ -145,7 +143,7 @@ async def get_forecast(latitude: float, longitude: float) -> str:
 
 @mcp.tool()
 async def answer_question(question: str) -> str:
-    """Answer a question using the data provided in the clipboard.
+    """Answer a question.
 
     Args:
         question: Question to answer
@@ -175,7 +173,7 @@ ANSWER:
     )    
 
     response = client.models.generate_content(
-        model = "gemini-2.5-flash",
+        model = "gemini-2.5-flash-lite",
         contents = contents,
         config = config,
     )
@@ -229,7 +227,6 @@ RESULT:
 
 
 if __name__ == "__main__":
-    # Initialize and run the server
     logging.basicConfig(level=logging.INFO)
     logger = logging.getLogger(__name__)
     logger.info("Starting weather service")
