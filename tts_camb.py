@@ -1,5 +1,9 @@
 import requests
 import time
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Define the text and voice characteristics
 tts_payload = {
@@ -12,7 +16,7 @@ tts_payload = {
 
 # Set up your API credentials
 headers = {
-    "x-api-key": "76a02c29-59c6-45da-beca-52b73d537d8a",  # Replace with your actual API key
+    "x-api-key": os.getenv("X_API_KEY"),  # Replace with your actual API key
     "Content-Type": "application/json"
 }
 
