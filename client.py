@@ -15,9 +15,11 @@ from google import genai
 from google.genai import types
 from dotenv import load_dotenv
 from pydantic import BaseModel, config
-import os, logging, json
+from tts_google import generate
+import os, logging, json, simpleaudio as sa
 
 load_dotenv()
+logging.basicConfig(level=logging.INFO)
 
 class MCPClient:
     def __init__(self):
@@ -107,7 +109,8 @@ class MCPClient:
                     name=tool_name,
                     arguments=tool_args,
                 )
-                final_text += f"[Calling tool {tool_name} with args {tool_args}]\n{result.structuredContent['result']}\n"
+                logging.info(f'[Calling tool {tool_name} with args {tool_args}]\n')
+                final_text += result.structuredContent['result']
 
             elif part.text:
                 final_text += part.text
@@ -128,6 +131,14 @@ class MCPClient:
                     
                 response = await self.process_query(query)
                 print("\n" + response)
+
+
+                # generate(response)
+                # wave_obj = sa.WaveObject.from_wave_file("audio\speech_0.wav")
+                # play_obj = wave_obj.play()
+                # play_obj.wait_done()
+
+
                     
             except Exception as e:
                 import traceback
