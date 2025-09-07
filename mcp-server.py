@@ -4,9 +4,13 @@ import logging
 import random
 import requests
 import os
+import pyperclip
 
 from dotenv import load_dotenv
+from google import genai
+from google.genai import types
 from mcp.server.fastmcp import FastMCP
+from urllib3 import response
 
 # Initialize FastMCP server
 mcp = FastMCP("weather")
@@ -18,7 +22,9 @@ load_dotenv()
 # Constants
 NWS_API_BASE = "https://api.weather.gov"
 WEATHER_API_KEY = os.getenv('WEATHER_API_KEY')
+GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
 USER_AGENT = "weather-app/1.0"
+client = genai.Client(api_key=GEMINI_API_KEY)
 
 
 async def make_nws_request(url: str) -> dict[str, Any] | None:
@@ -135,6 +141,91 @@ async def get_forecast(latitude: float, longitude: float) -> str:
         forecasts.append(forecast)
 
     return "\n---\n".join(forecasts)
+
+
+@mcp.tool()
+async def answer_question(question: str) -> str:
+    """Answer a question using the data provided in the clipboard.
+
+    Args:
+        question: Question to answer
+    """
+    prompt = f"""  
+You are a chatbot agent answeering questions.
+Your task is to answer the question provided in the <DATA> section.
+
+<DATA>
+<QUESTION>{question}</QUESTION>
+</DATA>
+
+ANSWER:
+"""
+
+    grounding_tool = types.Tool(
+        google_search=types.GoogleSearch()
+    )
+
+    contents = types.Content(
+        role="user",
+        parts=[types.Part(text=prompt)]
+    )
+
+    config = types.GenerateContentConfig(
+        tools=[grounding_tool]
+    )    
+
+    response = client.models.generate_content(
+        model = "gemini-2.5-flash",
+        contents = contents,
+        config = config,
+    )
+
+    return response.text
+
+
+@mcp.tool()
+async def interact_with_copied_text(action: str) -> str:
+    """Interact with the clipboard text.
+
+    Args:
+        text: Text to interact with
+    """
+    prompt_text=pyperclip.paste()
+    prompt_action = action
+
+    prompt = f"""  
+You are a chatbot agent performing actions with text .
+Your task is to perform the action with text using the data provided in the <DATA> section.
+
+<DATA>
+<TEXT>{prompt_text}</TEXT>
+<ACTION>{prompt_action}</ACTION>
+</DATA>
+
+RESULT: 
+"""
+
+    grounding_tool = types.Tool(
+        google_search=types.GoogleSearch()
+    )
+
+    contents = types.Content(
+        role="user",
+        parts=[types.Part(text=prompt)]
+    )
+
+    config = types.GenerateContentConfig(
+        tools=[grounding_tool]
+    )    
+
+    response = client.models.generate_content(
+        model = "gemini-2.5-flash",
+        contents = contents,
+        config = config,
+    )
+
+    return response.text
+
 
 
 if __name__ == "__main__":
