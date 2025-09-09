@@ -10,11 +10,9 @@ from dotenv import load_dotenv
 from google import genai
 from google.genai import types
 from mcp.server.fastmcp import FastMCP
-# from urllib3 import response
+from spotify import play_track, pause_playback, start_playback
 
-# Initialize FastMCP server
 mcp = FastMCP("weather")
-
 
 
 load_dotenv()
@@ -50,6 +48,29 @@ Area: {props.get('areaDesc', 'Unknown')}
 Severity: {props.get('severity', 'Unknown')}
 Description: {props.get('description', 'No description available')}
 Instructions: {props.get('instruction', 'No specific instructions provided')}"""
+
+
+@mcp.tool()
+async def play_track_tool(name: str) -> str:
+    """Play a track on Spotify.
+
+    Args:
+        name: Name of the track to play
+    """
+    return play_track(name)
+
+
+@mcp.tool()
+async def pause_playback_tool() -> str:
+    """Pause playback on Spotify."""
+    pause_playback()
+    return "Playback paused."
+
+@mcp.tool()
+async def resume_playback_tool() -> str:
+    """Resume playback on Spotify."""
+    start_playback()
+    return "Playback resumed."
 
 @mcp.tool()
 async def get_alerts(state: str) -> str:
