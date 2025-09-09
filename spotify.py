@@ -10,9 +10,10 @@ CLIENT_SECRET = os.getenv('SPOTIPY_CLIENT_SECRET')
 REDIRECT_URI = os.getenv('SPOTIPY_REDIRECT_URI')
 
 
-scope = "user-library-read"
+scope = "user-top-read"
 
 sp = spotipy.Spotify(auth_manager=SpotifyOAuth(scope=scope))
 
-results = sp.artist('https://open.spotify.com/artist/3TVXtAsR1Inumwj472S9r4')
-print(results)
+results = sp.current_user_top_tracks()
+for item in results['items']:
+    print(item['name'])
