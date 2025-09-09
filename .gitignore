@@ -10,8 +10,4 @@ wheels/
 .venv
 .env
 .cache
-<<<<<<< HEAD
 audio/*
-=======
-audio/*
->>>>>>> 1459ebbb592a7a96e8862c3739b8b8e55b0faaf3
