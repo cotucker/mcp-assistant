@@ -31,3 +31,7 @@ def pause_playback():
 def start_playback():
     sp.start_playback(device_id=DEVICE_ID)
 
+if __name__ == "__main__":
+    res = sp.search('track:A million artist:Lil Wayne', 1, type='track')
+    print(res)
+

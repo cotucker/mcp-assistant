@@ -16,6 +16,7 @@ from google.genai import types
 from dotenv import load_dotenv
 from pydantic import BaseModel, config
 from tts_google import generate
+from asr import asr
 import os, logging, json, simpleaudio as sa
 
 load_dotenv()
@@ -125,7 +126,10 @@ class MCPClient:
         while True:
             try:
                 query = input("\nQuery: ").strip()
-                
+
+                voice_query = asr()
+
+
                 if query.lower() == 'quit':
                     break
                     

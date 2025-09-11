@@ -13,7 +13,7 @@ options = SpeakOptions(model="aura-2-helena-en")
 
 # Convert text to speech and save to file
 response = deepgram.speak.rest.v("1").save(
-    "output.mp3",
-    {"text": "Hello world!"},
+    "audio\output.mp3",
+    {"text": "A Mili"},
     options
 )
