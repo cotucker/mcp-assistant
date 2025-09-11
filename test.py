@@ -1,42 +1,29 @@
-from deepgram import (
-    SpeakWSOptions,
-    SpeakWebSocketEvents,
-    DeepgramClient
-)
-import os
-from dotenv import load_dotenv
+import concurrent.futures, time
+from asr import asr
 
-load_dotenv()
+def text_query():
+    query = input("\nQuery: ").strip()
+    return query
+
+def voice_query():
+    return asr()
+
+def get_query() -> str:
+    with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
+        future_keyboard = executor.submit(text_query)
+        future_mic = executor.submit(voice_query)
+        for future in concurrent.futures.as_completed([future_keyboard, future_mic]):
+            try:
+                result = future.result()
+                if result:
+                    search_query = result
+                    break
+            except Exception as e:
+                print(f"В одном из потоков произошла ошибка: {e}")       
+        return f"Result: {search_query}"
 
 
-deepgram = DeepgramClient(os.getenv('DEEPGRAM_API_KEY'))
 
-# Create websocket connection
-connection = deepgram.speak.websocket.v("1")
+if __name__ == "__main__":
+    print(get_query())
 
-# Handle audio data
-@connection.on(SpeakWebSocketEvents.AudioData, on_audio_data)
-async def on_audio_data(data: bytes):
-    """Handle audio data received from the server."""
-    print(f"Received audio data: {data}")
-    # Save audio data to a file
-    with open("output.wav", "ab") as f:
-        f.write(data)
-
-connection = deepgram.speak.websocket.v("1")
-
-# Configure streaming options
-options = SpeakWSOptions(
-    model="aura-2-thalia-en",
-    encoding="linear16",
-    sample_rate=16000
-)
- 
-# Start connection and send text
-connection.start(options)
-connection.send_text("Hello, this is a text to speech example.")
-connection.flush()
-connection.wait_for_complete()
-
-# Close when done
-connection.finish()
