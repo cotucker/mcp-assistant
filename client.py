@@ -8,18 +8,17 @@ from mcp.client.stdio import stdio_client
 import json
 from typing import Any
 import enum
+import speech_recognition as sr
 from google.protobuf.message import Message
 
-from anthropic import Anthropic
 from google import genai
 from google.genai import types
 from dotenv import load_dotenv
-from pydantic import BaseModel, config
-from asr import save_audio
 import os, logging, json, simpleaudio as sa
+from tts_deepgram import tts_deepgram
 
 load_dotenv()
-logging.basicConfig(level=logging.INFO)
+# logging.basicConfig(level=logging.INFO)
 
 class MCPClient:
     def __init__(self):
@@ -121,25 +120,16 @@ class MCPClient:
         """Run an interactive chat loop"""
         print("\nMCP Client Started!")
         print("Type your queries or 'quit' to exit.")
-        
         while True:
             try:
-                query = input("\nQuery: ").strip()
-
+                query = input("\n💬: ")
                 if query.lower() == 'quit':
                     break
-                    
+                        
                 response = await self.process_query(query)
-                print("\n" + response)
+                print("✨: " + response)
 
-
-                # generate(response)
-                # wave_obj = sa.WaveObject.from_wave_file("audio\speech_0.wav")
-                # play_obj = wave_obj.play()
-                # play_obj.wait_done()
-
-
-                    
+                        
             except Exception as e:
                 import traceback
                 error_info = traceback.format_exc()

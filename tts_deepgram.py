@@ -1,19 +1,23 @@
-from copy import deepcopy
 from deepgram import SpeakOptions, DeepgramClient
 import os
+from pydub import AudioSegment
+from pydub.playback import play
 from dotenv import load_dotenv
 
 load_dotenv()
-
-# Initialize the client
 deepgram = DeepgramClient(os.getenv('DEEPGRAM_API_KEY'))
-
-# Configure speech options
 options = SpeakOptions(model="aura-2-helena-en")
 
-# Convert text to speech and save to file
-response = deepgram.speak.rest.v("1").save(
-    "audio\output.mp3",
-    {"text": "A Mili"},
-    options
-)
+def tts_deepgram(text: str):
+    deepgram.speak.rest.v("1").save(
+        "audio\output.mp3",
+        {"text": text},
+        options
+    )
+    sound = AudioSegment.from_mp3('audio\output.mp3')
+    play(sound)
+
+
+if __name__ == '__main__':
+    tts_deepgram('Hello, world!')
+

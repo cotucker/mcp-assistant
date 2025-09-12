@@ -1,19 +1,11 @@
-import whisper
-import torch
+from RealtimeSTT import AudioToTextRecorder
 
-if torch.cuda.is_available():
-    device = "cuda"
-else:
-    device = "cpu"
+def process_text(text):
+    print(text)
 
-print(device)
+if __name__ == '__main__':
+    print("Wait until it says 'speak now'")
+    recorder = AudioToTextRecorder(device="cuda", model="tiny.en")
 
-
-model = whisper.load_model("tiny", in_memory=True)
-result = model.transcribe("audio\output0.mp3")
-print(result["text"])
-
-
-
-
-
+    while True:
+        recorder.text(process_text)
