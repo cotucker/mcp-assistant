@@ -177,6 +177,10 @@ Your task is to answer the question provided in the <DATA> section.
 <QUESTION>{question}</QUESTION>
 </DATA>
 
+<INSTRUCTIONS>
+Provide answer in plain text without markdown formatting.
+</INSTRUCTIONS>
+
 ANSWER:
 """
 
