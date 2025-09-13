@@ -21,7 +21,7 @@ from RealtimeSTT import AudioToTextRecorder
 import pyautogui, warnings
 
 warnings.filterwarnings("ignore", category=UserWarning, module='ctranslate2')
-# logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.ERROR)
 load_dotenv()
 
 class MCPClient:
@@ -55,7 +55,6 @@ class MCPClient:
         
         await self.session.initialize()
         
-        # List available tools
         response = await self.session.list_tools()
         tools = response.tools
         print("\nConnected to server with tools:", [tool.name for tool in tools])
@@ -124,7 +123,10 @@ class MCPClient:
         """Run an interactive chat loop"""
         print("\nMCP Client Started!")
         print("Type your queries or 'quit' to exit.")
-        with AudioToTextRecorder(device="cuda", model="tiny.en", enable_realtime_transcription=True, level=logging.ERROR) as recorder:
+        with AudioToTextRecorder(device="cuda", model="tiny.en",
+        enable_realtime_transcription=True,
+        realtime_model_type="tiny.en",
+        level=logging.ERROR) as recorder:
             while True:
                 try:
                     print("\n💬: ")
@@ -135,6 +137,8 @@ class MCPClient:
                             
                     response = await self.process_query(query)
                     print("✨: " + response)
+                    if response == '':
+                        continue
                     tts_piper(response)
 
                             

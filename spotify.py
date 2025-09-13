@@ -17,9 +17,30 @@ scope = "user-modify-playback-state user-read-currently-playing"
 
 sp = spotipy.Spotify(auth_manager=SpotifyOAuth(scope=scope))
 
-def play_track(name: str):
-    track_name = sp.search(name, 1, type='track')
-    for track in track_name['tracks']['items']:
+def play_music(name: str, type: str) -> str:
+    item = sp.search(q=name, limit=1, type=type)
+    if type == 'track':
+        for track in item['tracks']['items']:
+            track_uri = track['uri']
+            reply = f"Playing {track['name']} by {track['artists'][0]['name']}"
+            sp.start_playback(device_id=DEVICE_ID, uris=[track_uri])
+            return reply
+    elif type == 'album':
+        for album in item['albums']['items']:
+            album_uri = album['uri']
+            reply = f"Playing {album['name']} by {album['artists'][0]['name']}"
+            sp.start_playback(device_id=DEVICE_ID, context_uri=album_uri)
+            return reply
+    elif type == 'artist':
+        for artist in item['artists']['items']:
+            artist_uri = artist['uri']
+            reply = f"Playing {artist['name']}"
+            sp.start_playback(device_id=DEVICE_ID, context_uri=artist_uri)
+            return reply
+    else:
+        return "Invalid type. Please choose 'track', 'album', or 'artist'."
+
+    for track in item['tracks']['items']:
         track_uri = track['uri']
         reply = f"Playing {track['name']} by {track['artists'][0]['name']}"
         sp.start_playback(device_id=DEVICE_ID, uris=[track_uri])

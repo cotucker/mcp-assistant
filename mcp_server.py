@@ -10,7 +10,7 @@ from dotenv import load_dotenv
 from google import genai
 from google.genai import types
 from mcp.server.fastmcp import FastMCP
-from spotify import play_track, pause_playback, start_playback, play_next_track, get_currently_playing_track
+from spotify import play_music, pause_playback, start_playback, play_next_track, get_currently_playing_track
 
 mcp = FastMCP("weather")
 
@@ -51,13 +51,14 @@ Instructions: {props.get('instruction', 'No specific instructions provided')}"""
 
 
 @mcp.tool()
-async def play_track_tool(name: str) -> str:
-    """Play a track on Spotify.
+async def play_music_tool(name: str, type: str) -> str:
+    """Play a music on Spotify.
 
     Args:
-        name: Name of the track to play
+        name: Name of the music to play
+        type: Type of the music to play (track, album, artist)
     """
-    return play_track(name)
+    return play_music(name, type)
 
 
 @mcp.tool()
