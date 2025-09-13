@@ -16,6 +16,7 @@ from google.genai import types
 from dotenv import load_dotenv
 import os, logging, json, simpleaudio as sa
 from tts_deepgram import tts_deepgram
+from tts_piper import tts_piper
 from RealtimeSTT import AudioToTextRecorder
 import pyautogui, warnings
 
@@ -133,6 +134,7 @@ class MCPClient:
                             
                     response = await self.process_query(query)
                     print("✨: " + response)
+                    tts_piper(response)
 
                             
                 except Exception as e:
