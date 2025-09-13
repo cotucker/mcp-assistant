@@ -10,7 +10,7 @@ from dotenv import load_dotenv
 from google import genai
 from google.genai import types
 from mcp.server.fastmcp import FastMCP
-from spotify import play_track, pause_playback, start_playback
+from spotify import play_track, pause_playback, start_playback, play_next_track, get_currently_playing_track
 
 mcp = FastMCP("weather")
 
@@ -65,6 +65,17 @@ async def pause_playback_tool() -> str:
     """Pause playback on Spotify."""
     pause_playback()
     return "Playback paused."
+
+@mcp.tool()
+async def play_next_track_tool() -> str:
+    """Play the next track on Spotify."""
+    play_next_track()
+    return ""
+
+@mcp.tool()
+async def get_currently_playing_track_tool() -> str:
+    """Get the currently playing track on Spotify."""
+    return get_currently_playing_track()
 
 @mcp.tool()
 async def resume_playback_tool() -> str:
@@ -178,7 +189,7 @@ Your task is to answer the question provided in the <DATA> section.
 </DATA>
 
 <INSTRUCTIONS>
-Provide answer in plain text without markdown formatting.
+Provide brief answer in plain text without any formatting.
 </INSTRUCTIONS>
 
 ANSWER:

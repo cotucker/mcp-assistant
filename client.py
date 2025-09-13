@@ -21,6 +21,7 @@ from RealtimeSTT import AudioToTextRecorder
 import pyautogui, warnings
 
 warnings.filterwarnings("ignore", category=UserWarning, module='ctranslate2')
+# logging.basicConfig(level=logging.INFO)
 load_dotenv()
 
 class MCPClient:
@@ -90,7 +91,7 @@ class MCPClient:
 
         config = types.GenerateContentConfig(tools = tools)
         response = await self.gemini.aio.models.generate_content(
-            model="gemini-2.5-flash",
+            model="gemini-2.0-flash",
             contents=contents,
             config=config
         )

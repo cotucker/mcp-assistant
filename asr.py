@@ -2,7 +2,6 @@ import warnings
 warnings.filterwarnings("ignore", category=UserWarning, module='ctranslate2')
 
 from RealtimeSTT import AudioToTextRecorder
-import pyautogui
 
 def process_text(text):
     print(text)
