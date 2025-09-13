@@ -16,9 +16,11 @@ from google.genai import types
 from dotenv import load_dotenv
 import os, logging, json, simpleaudio as sa
 from tts_deepgram import tts_deepgram
+from RealtimeSTT import AudioToTextRecorder
+import pyautogui, warnings
 
+warnings.filterwarnings("ignore", category=UserWarning, module='ctranslate2')
 load_dotenv()
-# logging.basicConfig(level=logging.INFO)
 
 class MCPClient:
     def __init__(self):
@@ -120,25 +122,31 @@ class MCPClient:
         """Run an interactive chat loop"""
         print("\nMCP Client Started!")
         print("Type your queries or 'quit' to exit.")
-        while True:
-            try:
-                query = input("\n💬: ")
-                if query.lower() == 'quit':
-                    break
-                        
-                response = await self.process_query(query)
-                print("✨: " + response)
+        with AudioToTextRecorder(device="cuda", model="tiny.en", enable_realtime_transcription=True, level=logging.ERROR) as recorder:
+            while True:
+                try:
+                    print("\n💬: ")
+                    query = recorder.text()
+                    print(query)
+                    if query.lower().find('quit') != -1 :
+                        break
+                            
+                    response = await self.process_query(query)
+                    print("✨: " + response)
 
-                        
-            except Exception as e:
-                import traceback
-                error_info = traceback.format_exc()
-                print(f"\nError (Client): {str(e)}")
-                print(f"\nError Details:\n{error_info}")
+                            
+                except Exception as e:
+                    import traceback
+                    error_info = traceback.format_exc()
+                    print(f"\nError (Client): {str(e)}")
+                    print(f"\nError Details:\n{error_info}")
     
     async def cleanup(self):
         """Clean up resources"""
         await self.exit_stack.aclose()
+
+    def process_text(text):
+        pyautogui.typewrite(text + " ")
 
 async def main():
     if len(sys.argv) < 2:
