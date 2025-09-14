@@ -13,7 +13,7 @@ REDIRECT_URI = os.getenv('SPOTIPY_REDIRECT_URI')
 DEVICE_ID = '807cea9a26b8f1dd602ccc6f8279939e47a9d2bc'
 
 
-scope = "user-modify-playback-state user-read-currently-playing"
+scope = "user-modify-playback-state user-read-currently-playing playlist-read-private user-top-read user-library-read"
 
 sp = spotipy.Spotify(auth_manager=SpotifyOAuth(scope=scope))
 
@@ -55,6 +55,14 @@ def start_playback():
 def play_next_track():
     sp.next_track(device_id=DEVICE_ID)
 
+def play_previous_track():
+    sp.previous_track(device_id=DEVICE_ID)
+
+def get_playlists():
+    playlists = sp.current_user_top_artists
+    for album in playlists['items']:
+        print(album['album']['name'])
+
 def get_currently_playing_track():
     current_track = sp.currently_playing()
     if current_track is not None:
@@ -65,6 +73,5 @@ def get_currently_playing_track():
         return "No track is currently playing."
 
 if __name__ == "__main__":
-    res = sp.search('track:A million artist:Lil Wayne', 1, type='track')
-    print(res)
+    get_playlists()
 
