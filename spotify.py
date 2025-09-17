@@ -1,7 +1,7 @@
 from pydantic.errors import DEV_ERROR_DOCS_URL
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
-import os
+import os, random
 from dotenv import load_dotenv
 
 
@@ -37,8 +37,14 @@ def play_music(name: str, type: str) -> str:
             reply = f"Playing {artist['name']}"
             sp.start_playback(device_id=DEVICE_ID, context_uri=artist_uri)
             return reply
+    elif type == 'playlist':
+        for playlist in item['playlists']['items']:
+            playlist_uri = playlist['uri']
+            reply = f"Playing {playlist['name']}"
+            sp.start_playback(device_id=DEVICE_ID, context_uri=playlist_uri)
+            return reply
     else:
-        return "Invalid type. Please choose 'track', 'album', or 'artist'."
+        return "Invalid type. Please choose 'track', 'album', 'artist', or 'playlist'."
 
     for track in item['tracks']['items']:
         track_uri = track['uri']
@@ -58,10 +64,25 @@ def play_next_track():
 def play_previous_track():
     sp.previous_track(device_id=DEVICE_ID)
 
-def get_playlists():
-    playlists = sp.current_user_top_artists
-    for album in playlists['items']:
-        print(album['album']['name'])
+def set_volume(volume: int):
+    sp.volume(volume, device_id=DEVICE_ID)
+
+
+
+def play_personal_playlists():
+    artists = sp.current_user_top_artists(limit = 5)
+    tracks = sp.current_user_top_tracks()
+    artists_ids = [artist['id'] for artist in artists['items']]
+
+    tracks_uris = [track['uri'] for track in tracks['items']]
+    for artist_id in artists_ids:
+        artists_top_tracks = sp.artist_top_tracks(artist_id)
+        tracks_uris.extend([track['uri'] for track in artists_top_tracks['tracks']])
+
+    random.shuffle(tracks_uris)
+
+    sp.start_playback(device_id=DEVICE_ID, uris=tracks_uris)
+    
 
 def get_currently_playing_track():
     current_track = sp.currently_playing()
@@ -73,5 +94,5 @@ def get_currently_playing_track():
         return "No track is currently playing."
 
 if __name__ == "__main__":
-    get_playlists()
+    play_personal_playlists()
 
