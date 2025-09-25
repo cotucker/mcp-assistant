@@ -49,6 +49,11 @@ Severity: {props.get('severity', 'Unknown')}
 Description: {props.get('description', 'No description available')}
 Instructions: {props.get('instruction', 'No specific instructions provided')}"""
 
+@mcp.tool()
+async def stop_voice_tool() -> str:
+    """Stop the current voice playback."""
+    return 'stop'
+
 
 @mcp.tool()
 async def play_music_tool(name: str, type: str) -> str:
@@ -196,7 +201,7 @@ async def get_forecast(latitude: float, longitude: float) -> str:
 
 
 @mcp.tool()
-async def answer_question(question: str) -> str:
+async def answer_real_time_question(question: str) -> str:
     """Answer a question.
 
     Args:

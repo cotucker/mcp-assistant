@@ -16,7 +16,7 @@ from google.genai import types
 from dotenv import load_dotenv
 import os, logging, json, simpleaudio as sa
 from tts_deepgram import tts_deepgram
-from tts_piper import tts_piper
+from tts_piper import tts_piper, stop_playback
 from RealtimeSTT import AudioToTextRecorder
 import pyautogui, warnings
 
@@ -90,7 +90,7 @@ class MCPClient:
 
         config = types.GenerateContentConfig(tools = tools)
         response = await self.gemini.aio.models.generate_content(
-            model="gemini-2.0-flash",
+            model="gemini-2.5-flash",
             contents=contents,
             config=config
         )
@@ -98,7 +98,7 @@ class MCPClient:
         response = response.candidates[0]
 
         final_text = ''
-
+        
         content = response.content
         for part in content.parts:
             if part.function_call:
@@ -134,12 +134,18 @@ class MCPClient:
                     print(query)
                     if query.lower().find('quit') != -1 :
                         break
+                    elif query.lower().find('stop') != -1:
+                        stop_playback()
+                        continue
+
                             
                     response = await self.process_query(query)
                     print("✨: " + response)
                     if response == '':
                         continue
+
                     tts_piper(response)
+
 
                             
                 except Exception as e:
