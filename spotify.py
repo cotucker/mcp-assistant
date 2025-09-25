@@ -12,8 +12,7 @@ CLIENT_SECRET = os.getenv('SPOTIPY_CLIENT_SECRET')
 REDIRECT_URI = os.getenv('SPOTIPY_REDIRECT_URI')
 DEVICE_ID = '807cea9a26b8f1dd602ccc6f8279939e47a9d2bc'
 
-
-scope = "user-modify-playback-state user-read-currently-playing playlist-read-private user-top-read user-library-read"
+scope = "user-modify-playback-state user-read-currently-playing playlist-read-private user-top-read user-library-read user-library-modify"
 
 sp = spotipy.Spotify(auth_manager=SpotifyOAuth(scope=scope))
 
@@ -83,6 +82,14 @@ def play_personal_playlists():
 
     sp.start_playback(device_id=DEVICE_ID, uris=tracks_uris)
     
+def save_currently_playing_track():
+    current_track = sp.currently_playing()
+    if current_track is not None:
+        track_uri = current_track['item']['uri']
+        sp.current_user_saved_tracks_add([track_uri])
+        return f"Track saved"
+    else:
+        return "No track is currently playing."
 
 def get_currently_playing_track():
     current_track = sp.currently_playing()

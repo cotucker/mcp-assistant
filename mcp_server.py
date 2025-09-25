@@ -10,7 +10,7 @@ from dotenv import load_dotenv
 from google import genai
 from google.genai import types
 from mcp.server.fastmcp import FastMCP
-from spotify import play_music, pause_playback, start_playback, play_next_track, get_currently_playing_track, play_previous_track, set_volume, play_personal_playlists
+from spotify import play_music, pause_playback, start_playback, play_next_track, get_currently_playing_track, play_previous_track, set_volume, play_personal_playlists, save_currently_playing_track
 
 mcp = FastMCP("weather")
 
@@ -50,10 +50,9 @@ Description: {props.get('description', 'No description available')}
 Instructions: {props.get('instruction', 'No specific instructions provided')}"""
 
 @mcp.tool()
-async def stop_voice_tool() -> str:
-    """Stop the current voice playback."""
-    return 'stop'
-
+async def save_currently_playing_track_tool() -> str:
+    """Save the currently playing track on Spotify."""
+    return save_currently_playing_track()
 
 @mcp.tool()
 async def play_music_tool(name: str, type: str) -> str:
