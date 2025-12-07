@@ -2,7 +2,7 @@ import wave, time, threading
 import simpleaudio as sa
 from piper import PiperVoice
 
-voice = PiperVoice.load("audio\\en_US-hfc_female-medium.onnx", use_cuda=True)
+voice = PiperVoice.load("audio/en_US-hfc_female-medium.onnx", use_cuda=True)
 
 play_obj = None
 play_lock = threading.Lock()
@@ -10,11 +10,11 @@ play_lock = threading.Lock()
 def synthesize_and_play(text: str):
     global play_obj
 
-    with wave.open("audio\\output.wav", "wb") as wav_file:
+    with wave.open("audio/output.wav", "wb") as wav_file:
         voice.synthesize_wav(text, wav_file)
 
-    wave_read = sa.WaveObject.from_wave_file("audio\\output.wav")
-    
+    wave_read = sa.WaveObject.from_wave_file("audio/output.wav")
+
     with play_lock:
         play_obj = wave_read.play()
 

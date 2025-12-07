@@ -10,11 +10,14 @@ load_dotenv()
 CLIENT_ID = os.getenv('SPOTIPY_CLIENT_ID')
 CLIENT_SECRET = os.getenv('SPOTIPY_CLIENT_SECRET')
 REDIRECT_URI = os.getenv('SPOTIPY_REDIRECT_URI')
-DEVICE_ID = '807cea9a26b8f1dd602ccc6f8279939e47a9d2bc'
+DEVICE_ID = '28f5e570e7c32a1f8e1a0b70fe80d29d29ec7a07'
 
-scope = "user-modify-playback-state user-read-currently-playing playlist-read-private user-top-read user-library-read user-library-modify"
+scope = "user-read-playback-state user-modify-playback-state user-read-currently-playing playlist-read-private user-top-read user-library-read user-library-modify"
 
 sp = spotipy.Spotify(auth_manager=SpotifyOAuth(scope=scope))
+
+def get_device():
+    print(sp.devices())
 
 def play_music(name: str, type: str) -> str:
     item = sp.search(q=name, limit=1, type=type)
@@ -81,7 +84,7 @@ def play_personal_playlists():
     random.shuffle(tracks_uris)
 
     sp.start_playback(device_id=DEVICE_ID, uris=tracks_uris)
-    
+
 def save_currently_playing_track():
     current_track = sp.currently_playing()
     if current_track is not None:
@@ -101,5 +104,4 @@ def get_currently_playing_track():
         return "No track is currently playing."
 
 if __name__ == "__main__":
-    play_personal_playlists()
-
+    pause_playback()

@@ -33,7 +33,7 @@ class MCPClient:
 
     async def connect_to_server(self, server_script_path: str):
         """Connect to an MCP server
-        
+
         Args:
             server_script_path: Path to the server script (.py or .js)
         """
@@ -41,20 +41,20 @@ class MCPClient:
         is_js = server_script_path.endswith('.js')
         if not (is_python or is_js):
             raise ValueError("Server script must be a .py or .js file")
-            
+
         command = "python" if is_python else "node"
         server_params = StdioServerParameters(
             command=command,
             args=[server_script_path],
             env=None
         )
-        
+
         stdio_transport = await self.exit_stack.enter_async_context(stdio_client(server_params))
         self.stdio, self.write = stdio_transport
         self.session = await self.exit_stack.enter_async_context(ClientSession(self.stdio, self.write))
-        
+
         await self.session.initialize()
-        
+
         response = await self.session.list_tools()
         tools = response.tools
         print("\nConnected to server with tools:", [tool.name for tool in tools])
@@ -98,7 +98,7 @@ class MCPClient:
         response = response.candidates[0]
 
         final_text = ''
-        
+
         content = response.content
         for part in content.parts:
             if part.function_call:
@@ -123,7 +123,7 @@ class MCPClient:
         """Run an interactive chat loop"""
         print("\nMCP Client Started!")
         print("Type your queries or 'quit' to exit.")
-        with AudioToTextRecorder(device="cuda", model="tiny.en",
+        with AudioToTextRecorder(device="cpu", model="tiny.en",
         enable_realtime_transcription=True,
         realtime_model_type="tiny.en",
         level=logging.ERROR) as recorder:
@@ -138,7 +138,7 @@ class MCPClient:
                         stop_playback()
                         continue
 
-                            
+
                     response = await self.process_query(query)
                     print("✨: " + response)
                     if response == '':
@@ -147,13 +147,13 @@ class MCPClient:
                     tts_piper(response)
 
 
-                            
+
                 except Exception as e:
                     import traceback
                     error_info = traceback.format_exc()
                     print(f"\nError (Client): {str(e)}")
                     print(f"\nError Details:\n{error_info}")
-    
+
     async def cleanup(self):
         """Clean up resources"""
         await self.exit_stack.aclose()
@@ -165,7 +165,7 @@ async def main():
     if len(sys.argv) < 2:
         print("Usage: python client.py <path_to_server_script>")
         sys.exit(1)
-        
+
     client = MCPClient()
     try:
         await client.connect_to_server(sys.argv[1])
